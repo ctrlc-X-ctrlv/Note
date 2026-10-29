@@ -234,7 +234,7 @@
         descCount.textContent = count + " / 150";
     }
 
-    // Fungsi Tambah Koma & Spasi Otomatis
+    // Fungsi Tambah Titik Koma & Spasi Otomatis
     function autoAddCommaAndSpace() {
         var inputArea = document.getElementById("commaInput");
         var text = inputArea.value;
@@ -247,8 +247,12 @@
         var lines = text.split('\n');
         var processedLines = lines.map(function(line) {
             if (line.trim() === '') return line;
-            var trimmed = line.replace(/,\s*$/, '');
-            return trimmed + ", ";
+            
+            // Hapus titik koma atau koma serta spasi di akhir jika sudah ada
+            var trimmed = line.replace(/[;,]\s*$/, '');
+            
+            // Tambahkan titik koma dan 1 spasi di akhir
+            return trimmed + "; ";
         });
 
         var newText = processedLines.join('\n');
