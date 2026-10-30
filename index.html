@@ -4,76 +4,85 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notepad</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 <style>
-        body {
-            background-color: #d9dadf;
-            color: #000;
-            font-family: Arial, sans-serif;
-            padding: 0px 30px;
-        }
-        p {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .container {
-            display: flex;
-            padding-bottom: 45px;
-        }
-        .notepad-container textarea {
-            background-color: #d9dadf;
-            color: #000;
-        }
-        #editor {
-            width: 710px;
-            height: 450px;
-            border: 1px solid #ccc;
-            padding: 10px;
-        }
-        #statistics {
-            display: flex;
-            flex-direction: row;
-        }
-        #statistics p {
-            font-weight: normal;
-            margin: 0px 20px 0px 0px;
-        }
-        #wordCountResults {
-            margin-top: 10px;
-        }
-        .notepad-container,
-        .conversion-container {
-            flex: 1;
-        }
-        .conversion-container {
-            padding-left: 40px;
-        }
-        .conversion-container input[type="file"],
-        .conversion-container input[type="text"] {
-            margin: 2px 0px;
-        }
-        #titleCopy, #permalinkCopy, #question, #commaCopy {
-            vertical-align: top;
-            margin-top: 15px;
-        }
-        #desc {
-            width: 415px;
-            height: 50px;
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-        #commaInput {
-            width: 415px;
-            height: 150px; /* Ukuran diperpanjang ke bawah */
-            border: 1px solid #ccc;
-            padding: 5px;
-        }
-        #descCount {
-            font-weight: normal;
-        }
-        .descCount {
-            margin: 0px;
-        }
+    body {
+        background-color: #d9dadf;
+        color: #000;
+        font-family: Arial, sans-serif;
+        padding: 0px 30px;
+    }
+    p {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .container {
+        display: flex;
+        padding-bottom: 45px;
+    }
+    .notepad-container textarea {
+        background-color: #d9dadf;
+        color: #000;
+    }
+    #editor {
+        width: 710px;
+        height: 450px;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+    #statistics {
+        display: flex;
+        flex-direction: row;
+    }
+    #statistics p {
+        font-weight: normal;
+        margin: 0px 20px 0px 0px;
+    }
+    #wordCountResults {
+        margin-top: 10px;
+    }
+    .notepad-container,
+    .conversion-container {
+        flex: 1;
+    }
+    .conversion-container {
+        padding-left: 40px;
+    }
+    .conversion-container input[type="file"],
+    .conversion-container input[type="text"] {
+        margin: 2px 0px;
+    }
+    #titleCopy, #permalinkCopy, #question, #commaCopy {
+        vertical-align: top;
+        margin-top: 15px;
+    }
+    #desc {
+        width: 415px;
+        height: 50px;
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+    #commaInput {
+        width: 415px;
+        height: 150px;
+        border: 1px solid #ccc;
+        padding: 5px;
+    }
+    #descCount {
+        font-weight: normal;
+    }
+    .descCount {
+        margin: 0px;
+    }
+    .separator-options {
+        font-weight: normal;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+    .separator-options label {
+        margin-right: 15px;
+        cursor: pointer;
+    }
 </style>
 <script>
     // Array kata-kata yang ingin dihitung
@@ -234,12 +243,16 @@
         descCount.textContent = count + " / 150";
     }
 
-    // Fungsi Tambah Titik Koma & Spasi Otomatis
-    function autoAddCommaAndSpace() {
+    // Fungsi Otomatis Tambah Akhiran (Titik Koma atau Koma + Spasi)
+    function autoAddSuffixAndSpace() {
         var inputArea = document.getElementById("commaInput");
         var text = inputArea.value;
 
         if (!text) return;
+
+        // Cek simbol pilihan user ( ; atau , )
+        var selectedMode = document.querySelector('input[name="separatorMode"]:checked').value;
+        var suffix = (selectedMode === "comma") ? ", " : "; ";
 
         var startPos = inputArea.selectionStart;
         var endPos = inputArea.selectionEnd;
@@ -248,11 +261,11 @@
         var processedLines = lines.map(function(line) {
             if (line.trim() === '') return line;
             
-            // Hapus titik koma atau koma serta spasi di akhir jika sudah ada
+            // Hapus titik koma atau koma beserta spasi lama jika sudah ada
             var trimmed = line.replace(/[;,]\s*$/, '');
             
-            // Tambahkan titik koma dan 1 spasi di akhir
-            return trimmed + "; ";
+            // Tambahkan simbol akhiran dan 1 spasi
+            return trimmed + suffix;
         });
 
         var newText = processedLines.join('\n');
@@ -307,9 +320,17 @@
             <span id="descCount">0 / 150</span>
         </p>
 
-        <!-- Fitur Tambah Koma & Spasi -->
-        <p>Add Comma & Space</p>
-        <textarea id="commaInput" placeholder="" oninput="autoAddCommaAndSpace()"></textarea>
+        <!-- Fitur Tambah Koma / Titik Koma & Spasi -->
+        <p>Add Separator & Space</p>
+        <div class="separator-options">
+            <label>
+                <input type="radio" name="separatorMode" value="semicolon" checked onchange="autoAddSuffixAndSpace()"> Titik Koma (; )
+            </label>
+            <label>
+                <input type="radio" name="separatorMode" value="comma" onchange="autoAddSuffixAndSpace()"> Koma (, )
+            </label>
+        </div>
+        <textarea id="commaInput" placeholder="" oninput="autoAddSuffixAndSpace()"></textarea>
         <br>
         <button onclick="copyCommaText()">Copy</button>
     </div>
