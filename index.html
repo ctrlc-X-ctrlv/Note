@@ -243,36 +243,32 @@
         descCount.textContent = count + " / 150";
     }
 
-    // Fungsi Otomatis Tambah Akhiran (Titik Koma atau Koma + Spasi)
+    // Fungsi Otomatis Memisah Kata per Baris sekaligus Mempertahankan / Menambahkan Separator
     function autoAddSuffixAndSpace() {
         var inputArea = document.getElementById("commaInput");
-        var text = inputArea.value;
+        var rawText = inputArea.value;
 
-        if (!text) return;
+        if (!rawText) return;
 
-        // Cek simbol pilihan user ( ; atau , )
         var selectedMode = document.querySelector('input[name="separatorMode"]:checked').value;
         var suffix = (selectedMode === "comma") ? ", " : "; ";
 
-        var startPos = inputArea.selectionStart;
-        var endPos = inputArea.selectionEnd;
-
-        var lines = text.split('\n');
-        var processedLines = lines.map(function(line) {
-            if (line.trim() === '') return line;
-            
-            // Hapus titik koma atau koma beserta spasi lama jika sudah ada
-            var trimmed = line.replace(/[;,]\s*$/, '');
-            
-            // Tambahkan simbol akhiran dan 1 spasi
-            return trimmed + suffix;
+        // Memecah input berdasarkan koma, titik koma, atau baris baru
+        var rawItems = rawText.split(/[,;\n]+/);
+        
+        var processedLines = [];
+        rawItems.forEach(function(item) {
+            // Bersihkan kutipan tunggal/ganda berlebih dan spasi di ujung
+            var cleaned = item.replace(/^["'\s]+|["'\s]+$/g, '');
+            if (cleaned !== '') {
+                processedLines.push(cleaned + suffix);
+            }
         });
 
         var newText = processedLines.join('\n');
 
         if (inputArea.value !== newText) {
             inputArea.value = newText;
-            inputArea.setSelectionRange(startPos, endPos);
         }
     }
 
